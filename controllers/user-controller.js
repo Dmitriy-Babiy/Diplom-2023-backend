@@ -7,9 +7,9 @@ import ApiError from '../exceptions/api-error.js';
 class UserController {
     async registration(req, res, next) {
         try {
-            const errorsValidation = validationResult(req)
+            const errorsValidation = validationResult(req);
             if (!errorsValidation.isEmpty()) {
-                return next(ApiError.BadRequestError('Ошибка при валидации', errorsValidation.array()))
+                return next(ApiError.BadRequestError('Ошибка при валидации', errorsValidation.array()));
             }
             const { email, password, firstName, lastName } = req.body;
             const userData = await userService.registration(email, password, firstName, lastName);
@@ -44,7 +44,7 @@ class UserController {
 
     async refresh(req, res, next) {
         try {
-            const {refreshToken}  = req.cookies;
+            const { refreshToken } = req.cookies;
             const userData = await userService.refresh(refreshToken);
             res.cookie('refreshToken', userData.refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true });
             return res.json(userData);
@@ -53,10 +53,21 @@ class UserController {
         }
     }
 
-    async getUsers(req, res, next) {
+    async getAll(req, res, next) {
         try {
-            const users = await userService.getAllUsers()
-            return res.json(users)
+            const users = await userService.getAllUsers();
+            return res.json(users);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async update(req, res, next) {
+        try {
+            const { email } = req.user;
+            const avatarBase64 = req.body.avatar.replace(/^data:image\/\w+;base64,/, '');
+            const user = await userService.updateAvatar(email, avatarBase64);
+            return res.json(user);
         } catch (error) {
             next(error);
         }

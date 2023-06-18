@@ -18,6 +18,10 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    avatar: {
+        type: String,
+        default: null,
+    }
 });
 
 export default mongoose.model('User', UserSchema);
